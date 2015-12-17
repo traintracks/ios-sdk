@@ -11,9 +11,12 @@
 @interface Traintracks : NSObject
 
 #pragma mark - Properties
+@property (nonatomic, strong, readonly) NSString *endpointUrl;
+@property (nonatomic, strong, readonly) NSString *buildName;
 @property (nonatomic, strong, readonly) NSString *apiKey;
 @property (nonatomic, strong, readonly) NSString *apiSecret;
 @property (nonatomic, strong, readonly) NSString *userId;
+@property (nonatomic, strong, readonly) NSString *userName;
 @property (nonatomic, strong, readonly) NSString *deviceId;
 @property (nonatomic, assign) BOOL optOut;
 
@@ -57,9 +60,7 @@
 
 + (Traintracks*)instance;
 
-- (void)initializeWithApiKey:(NSString*) apiKey withSecret:(NSString*)apiSecret;
-- (void)initializeWithApiKey:(NSString*) apiKey withSecret:(NSString*)apiSecret withUserId:(NSString*) userId;
-
+- (void)initializeWithEndpoint:(NSString*)endpointUrl withBuildName:(NSString*)buildName withKey:(NSString*)key withSecret:secret withUserId:(NSString*) userId;
 
 /*!
  @method
@@ -75,25 +76,6 @@
 - (void)logEvent:(NSString*) eventType withEventProperties:(NSDictionary*) eventProperties;
 - (void)logEvent:(NSString*) eventType withEventProperties:(NSDictionary*) eventProperties outOfSession:(BOOL) outOfSession;
 
-/*!
- @method
-
- @abstract
- Tracks revenue.
-
- @param amount                   The amount of revenue to track, e.g. "3.99".
-
- @discussion
- To track revenue from a user, call [[Amplitude instance] logRevenue:[NSNumber numberWithDouble:3.99]] each time the user generates revenue.
- logRevenue: takes in an NSNumber with the dollar amount of the sale as the only argument. This allows us to automatically display
- data relevant to revenue on the Amplitude website, including average revenue per daily active user (ARPDAU), 7, 30, and 90 day revenue,
- lifetime value (LTV) estimates, and revenue by advertising campaign cohort and daily/weekly/monthly cohorts.
-
- For validating revenue, use [[Amplitude instance] logRevenue:@"com.company.app.productId" quantity:1 price:[NSNumber numberWithDouble:3.99] receipt:transactionReceipt]
- */
-- (void)logRevenue:(NSNumber*) amount;
-- (void)logRevenue:(NSString*) productIdentifier quantity:(NSInteger) quantity price:(NSNumber*) price;
-- (void)logRevenue:(NSString*) productIdentifier quantity:(NSInteger) quantity price:(NSNumber*) price receipt:(NSData*) receipt;
 
 /*!
  @method
@@ -152,6 +134,7 @@
  If your app has its own login system that you want to track users with, you can set the userId.
  */
 - (void)setUserId:(NSString*) userId;
+- (void)setUserName:(NSString*) userName;
 
 /*!
  @method

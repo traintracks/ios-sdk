@@ -56,6 +56,7 @@ static NSString *const MAX_EVENT_ID = @"maxEventId";
 static NSString *const MAX_IDENTIFY_ID = @"maxIdentifyId";
 static NSString *const OPT_OUT = @"optOut";
 static NSString *const USER_ID = @"userId";
+static NSString *const USER_NAME = @"userName";
 static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
 
 
@@ -82,6 +83,8 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
     int _backoffUploadBatchSize;
 
     BOOL _offline;
+    
+    NSDateFormatter *_dateFormatter;
 }
 
 #pragma clang diagnostic push
@@ -97,13 +100,8 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
     return _instance;
 }
 
-+ (void)initializeWithApiKey:(NSString*) apiKey {
-    [[Traintracks instance] initializeApiKey:apiKey];
-}
 
-+ (void)initializeWithApiKey:(NSString*) apiKey userId:(NSString*) userId {
-    [[Traintracks instance] initializeApiKey:apiKey userId:userId];
-}
+
 
 + (void)logEvent:(NSString*) eventType {
     [[Traintracks instance] logEvent:eventType];
@@ -111,18 +109,6 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
 
 + (void)logEvent:(NSString*) eventType withEventProperties:(NSDictionary*) eventProperties {
     [[Traintracks instance] logEvent:eventType withEventProperties:eventProperties];
-}
-
-+ (void)logRevenue:(NSNumber*) amount {
-    [[Traintracks instance] logRevenue:amount];
-}
-
-+ (void)logRevenue:(NSString*) productIdentifier quantity:(NSInteger) quantity price:(NSNumber*) price {
-    [[Traintracks instance] logRevenue:productIdentifier quantity:quantity price:price];
-}
-
-+ (void)logRevenue:(NSString*) productIdentifier quantity:(NSInteger) quantity price:(NSNumber*) price receipt:(NSData*) receipt {
-    [[Traintracks instance] logRevenue:productIdentifier quantity:quantity price:price receipt:receipt];
 }
 
 + (void)uploadEvents {
@@ -133,8 +119,8 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
     [[Traintracks instance] setUserProperties:userProperties];
 }
 
-+ (void)setUserId:(NSString*) userId {
-    [[Traintracks instance] setUserId:userId];
++ (void)setUserName:(NSString*) userName {
+    [[Traintracks instance] setUserName:userName];
 }
 
 + (void)enableLocationListening {
@@ -167,7 +153,9 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
 - (id)init
 {
     if (self = [super init]) {
-
+        
+        _dateFormatter = [[NSDateFormatter alloc]init];
+        [_dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZ"];
         _initialized = NO;
         _locationListeningEnabled = YES;
         _sessionId = -1;
@@ -266,9 +254,13 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
 
     // Release properties
     SAFE_ARC_RELEASE(_apiKey);
+    SAFE_ARC_RELEASE(_apiSecret);
     SAFE_ARC_RELEASE(_backgroundQueue);
     SAFE_ARC_RELEASE(_deviceId);
     SAFE_ARC_RELEASE(_userId);
+    SAFE_ARC_RELEASE(_userName);
+    SAFE_ARC_RELEASE(_buildName);
+    SAFE_ARC_RELEASE(_endpointUrl);
 
     // Release instance variables
     SAFE_ARC_RELEASE(_deviceInfo);
@@ -282,47 +274,48 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
     SAFE_ARC_SUPER_DEALLOC();
 }
 
-- (void)initializeApiKey:(NSString*) apiKey
-{
-    [self initializeApiKey:apiKey userId:nil setUserId: NO];
-}
-
-/**
- * Initialize Amplitude with a given apiKey and userId.
- */
-- (void)initializeApiKey:(NSString*) apiKey userId:(NSString*) userId
-{
-    [self initializeApiKey:apiKey userId:userId setUserId: YES];
-}
-
 /**
  * SetUserId: client explicitly initialized with a userId (can be nil).
  * If false, then attempt to load userId from saved eventsData.
  */
-- (void)initializeApiKey:(NSString*) apiKey userId:(NSString*) userId setUserId:(BOOL) setUserId
+- (void)initializeWithEndpoint:(NSString*)endpointUrl withBuildName:(NSString*)buildName withKey:(NSString*)key withSecret:secret withUserId:(NSString*)userId
 {
-    if (apiKey == nil) {
-        NSLog(@"ERROR: apiKey cannot be nil in initializeApiKey:");
+    if (endpointUrl == nil) {
+        NSLog(@"ERROR: endpointUrl cannot be nil in initializeWithEndpoint:");
+        return;
+    }
+    
+    if (buildName == nil) {
+        NSLog(@"ERROR: buildName cannot be nil in initializeWithEndpoint:");
+        return;
+    }
+    
+    if (key == nil) {
+        NSLog(@"ERROR: key cannot be nil in initializeWithEndpoint:");
         return;
     }
 
-    if (![self isArgument:apiKey validType:[NSString class] methodName:@"initializeApiKey:"]) {
+    if (secret == nil) {
+        NSLog(@"ERROR: secret cannot be nil in initializeWithEndpoint:");
         return;
     }
-    if (userId != nil && ![self isArgument:userId validType:[NSString class] methodName:@"initializeApiKey:"]) {
-        return;
-    }
-
-    if ([apiKey length] == 0) {
-        NSLog(@"ERROR: apiKey cannot be blank in initializeApiKey:");
-        return;
-    }
-    SAFE_ARC_RETAIN(apiKey);
+    
+    SAFE_ARC_RETAIN(key);
     SAFE_ARC_RELEASE(_apiKey);
-    _apiKey = apiKey;
+    _apiKey = key;
+    SAFE_ARC_RETAIN(secret);
+    SAFE_ARC_RELEASE(_apiSecret);
+    _apiSecret = secret;
+    SAFE_ARC_RETAIN(endpointUrl);
+    SAFE_ARC_RELEASE(_endpointUrl);
+    _endpointUrl = endpointUrl;
+    SAFE_ARC_RETAIN(buildName);
+    SAFE_ARC_RELEASE(_buildName);
+    _buildName = buildName;
+    
 
     [self runOnBackgroundQueue:^{
-        if (setUserId) {
+        if (userId) {
             [self setUserId:userId];
         } else {
             _userId = SAFE_ARC_RETAIN([[TTDatabaseHelper getDatabaseHelper] getValue:USER_ID]);
@@ -336,12 +329,10 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
         [self enterForeground];
     }
     _initialized = YES;
+    
 }
 
-- (void)initializeApiKey:(NSString*) apiKey userId:(NSString*) userId startSession:(BOOL)startSession
-{
-    [self initializeApiKey:apiKey userId:userId];
-}
+
 
 /**
  * Run a block in the background. If already in the background, run immediately.
@@ -383,6 +374,11 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
         return;
     }
 
+    if (_apiSecret == nil) {
+        NSLog(@"ERROR: apiSecret cannot be nil or empty, set apiSecret with initializeApiKey: before calling logEvent");
+        return;
+    }
+    
     if (![self isArgument:eventType validType:[NSString class] methodName:@"logEvent"]) {
         return;
     }
@@ -416,6 +412,30 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
         if (!loggingSessionEvent && !outOfSession) {
             [self startOrContinueSession:timestamp];
         }
+        
+        NSMutableDictionary *rootEvent = [NSMutableDictionary dictionary];
+        
+        [rootEvent setValue:_buildName forKey:@"build"];
+
+        NSString *clientTimestamp = [_dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:[timestamp longLongValue]/1000]];
+        
+        [rootEvent setValue:clientTimestamp forKey:@"clientTimestamp"];
+        [rootEvent setValue:_buildName forKey:@"build"];
+        [rootEvent setValue:eventType forKey:@"eventType"];
+        [rootEvent setValue:_userId forKey:@"userId"];
+        
+        if(_userName == nil) {
+            [rootEvent setValue:_userId forKey:@"userName"];
+        } else {
+            [rootEvent setValue:_userName forKey:@"userName"];
+        }
+
+        [rootEvent setValue:_deviceInfo.osName forKey:@"device"];
+        
+        // TODO:
+        // What to do about out of session
+        [rootEvent setValue:[NSNumber numberWithLongLong:_sessionId] forKey:@"sessionId"];
+
 
         NSMutableDictionary *event = [NSMutableDictionary dictionary];
         [event setValue:eventType forKey:@"eventType"];
@@ -431,9 +451,11 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
 
         [self annotateEvent:event];
 
+        [rootEvent setValue:event forKey:@"data"];
         // convert event dictionary to JSON String
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:event options:0 error:NULL];
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:rootEvent options:0 error:NULL];
         NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        NSLog(@"rootevent: %@", jsonString);
         if ([eventType isEqualToString:IDENTIFY_EVENT]) {
             [dbHelper addIdentify:jsonString];
         } else {
@@ -441,7 +463,8 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
         }
         SAFE_ARC_RELEASE(jsonString);
 
-        TRAINTRACKS_LOG(@"Logged %@ Event", event[@"eventType"]);
+        TRAINTRACKS_LOG(@"Logged %@ Event", rootEvent[@"eventType"]);
+        NSLog(@"Logged event: %@", jsonString);
 
         [self truncateEventQueues];
 
@@ -515,7 +538,7 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
             [coordinateInvocation getReturnValue:&lastKnownLocationCoordinate];
 
             [location setValue:[NSNumber numberWithDouble:lastKnownLocationCoordinate.latitude] forKey:@"lat"];
-            [location setValue:[NSNumber numberWithDouble:lastKnownLocationCoordinate.longitude] forKey:@"lng"];
+            [location setValue:[NSNumber numberWithDouble:lastKnownLocationCoordinate.longitude] forKey:@"lon"];
 
             [apiProperties setValue:location forKey:@"location"];
         }
@@ -604,7 +627,7 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
         }
         if (eventsDataLocal) {
             NSString *eventsString = [[NSString alloc] initWithData:eventsDataLocal encoding:NSUTF8StringEncoding];
-            [self makeEventUploadPostRequest:kTTEventLogUrl events:eventsString maxEventId:maxEventId maxIdentifyId:maxIdentifyId];
+            [self makeEventUploadPostRequest:_endpointUrl events:eventsString maxEventId:maxEventId maxIdentifyId:maxIdentifyId];
             SAFE_ARC_RELEASE(eventsString);
        }
     }];
@@ -640,13 +663,13 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
         if ([identifys count] == 0) {
             event = SAFE_ARC_RETAIN(events[0]);
             [events removeObjectAtIndex:0];
-            maxEventId = [[event objectForKey:@"event_id"] longValue];
+            maxEventId = [[event objectForKey:@"eventId"] longValue];
 
         // case 2: no events grab from identifys
         } else if ([events count] == 0) {
             identify = SAFE_ARC_RETAIN(identifys[0]);
             [identifys removeObjectAtIndex:0];
-            maxIdentifyId = [[identify objectForKey:@"event_id"] longValue];
+            maxIdentifyId = [[identify objectForKey:@"eventId"] longValue];
 
         // case 3: need to compare sequence numbers
         } else {
@@ -682,36 +705,31 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
 {
     NSMutableURLRequest *request =[NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
     [request setTimeoutInterval:60.0];
-
-    NSString *apiVersionString = [[NSNumber numberWithInt:kTTApiVersion] stringValue];
-
-    NSMutableData *postData = [[NSMutableData alloc] init];
-    [postData appendData:[@"v=" dataUsingEncoding:NSUTF8StringEncoding]];
-    [postData appendData:[apiVersionString dataUsingEncoding:NSUTF8StringEncoding]];
-    [postData appendData:[@"&client=" dataUsingEncoding:NSUTF8StringEncoding]];
-    [postData appendData:[_apiKey dataUsingEncoding:NSUTF8StringEncoding]];
-    [postData appendData:[@"&e=" dataUsingEncoding:NSUTF8StringEncoding]];
-    [postData appendData:[[self urlEncodeString:events] dataUsingEncoding:NSUTF8StringEncoding]];
-
-    // Add timestamp of upload
-    [postData appendData:[@"&upload_time=" dataUsingEncoding:NSUTF8StringEncoding]];
-    NSString *timestampString = [[NSNumber numberWithLongLong:[[self currentTime] timeIntervalSince1970] * 1000] stringValue];
-    [postData appendData:[timestampString dataUsingEncoding:NSUTF8StringEncoding]];
-
-    // Add checksum
-    [postData appendData:[@"&checksum=" dataUsingEncoding:NSUTF8StringEncoding]];
-    NSString *checksumData = [NSString stringWithFormat: @"%@%@%@%@", apiVersionString, _apiKey, events, timestampString];
-    NSString *checksum = [self md5HexDigest: checksumData];
-    [postData appendData:[checksum dataUsingEncoding:NSUTF8StringEncoding]];
-
     [request setHTTPMethod:@"POST"];
-    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-    [request setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[postData length]] forHTTPHeaderField:@"Content-Length"];
+    
+    // Header
+    NSString *checksumData = [NSString stringWithFormat:@"%@%@", events, _apiSecret];
+    NSString *checksum = [self md5HexDigest: checksumData];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setValue:_apiKey forHTTPHeaderField:@"X-Product-Key"];
+    [request setValue:[NSString stringWithFormat:@"%@", checksum] forHTTPHeaderField:@"X-Product-Auth"];
+    [request setValue:@"1.2.3.4" forHTTPHeaderField:@"Remote-Address"];
+    
+    // Body
+    NSMutableData *postData = [[NSMutableData alloc] init];
+    [postData appendData:[events dataUsingEncoding:NSUTF8StringEncoding]];
+    //[postData appendData:[[self urlEncodeString:events] dataUsingEncoding:NSUTF8StringEncoding]];
 
     [request setHTTPBody:postData];
-    TRAINTRACKS_LOG(@"Events: %@", events);
 
+
+
+
+    NSLog(@"URL: %@", [request URL]);
+    NSLog(@"HEADERS: %@", [request allHTTPHeaderFields]);
     SAFE_ARC_RELEASE(postData);
+
+    NSLog(@"BODY: %@", [[NSString alloc] initWithData:[request HTTPBody] encoding:NSUTF8StringEncoding]);
 
     // If pinning is enabled, use the AMPURLConnection that handles it.
     id Connection = [NSURLConnection class];
@@ -719,28 +737,18 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
         TTDatabaseHelper *dbHelper = [TTDatabaseHelper getDatabaseHelper];
         BOOL uploadSuccessful = NO;
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
+        NSString *result = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if (response != nil) {
             if ([httpResponse statusCode] == 200) {
-                NSString *result = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-                if ([result isEqualToString:@"success"]) {
-                    // success, remove existing events from dictionary
-                    uploadSuccessful = YES;
-                    if (maxEventId >= 0) {
-                        [dbHelper removeEvents:maxEventId];
-                    }
-                    if (maxIdentifyId >= 0) {
-                        [dbHelper removeIdentifys:maxIdentifyId];
-                    }
-                } else if ([result isEqualToString:@"invalid_api_key"]) {
-                    NSLog(@"ERROR: Invalid API Key, make sure your API key is correct in initializeApiKey:");
-                } else if ([result isEqualToString:@"bad_checksum"]) {
-                    NSLog(@"ERROR: Bad checksum, post request was mangled in transit, will attempt to reupload later");
-                } else if ([result isEqualToString:@"request_db_write_failed"]) {
-                    NSLog(@"ERROR: Couldn't write to request database on server, will attempt to reupload later");
-                } else {
-                    NSLog(@"ERROR: %@, will attempt to reupload later", result);
+                // success, remove existing events from dictionary
+                uploadSuccessful = YES;
+                if (maxEventId >= 0) {
+                    [dbHelper removeEvents:maxEventId];
                 }
-                SAFE_ARC_RELEASE(result);
+                if (maxIdentifyId >= 0) {
+                    [dbHelper removeIdentifys:maxIdentifyId];
+                }
+                NSLog(@"server response: %@", result);
             } else if ([httpResponse statusCode] == 413) {
                 // If blocked by one massive event, drop it
                 if (_backoffUpload && _backoffUploadBatchSize == 1) {
@@ -761,8 +769,7 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
                 [self uploadEventsWithLimit:_backoffUploadBatchSize];
 
             } else {
-                NSLog(@"ERROR: Connection response received:%ld, %@", (long)[httpResponse statusCode],
-                    SAFE_ARC_AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]));
+                NSLog(@"ERROR: Connection response received:%ld, %@", (long)[httpResponse statusCode], result);
             }
         } else if (error != nil) {
             if ([error code] == -1009) {
@@ -778,6 +785,8 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
             NSLog(@"ERROR: response empty, error empty for NSURLConnection");
         }
 
+        NSLog(@"Server responded: %@", result);
+        SAFE_ARC_RELEASE(result);
         _updatingCurrently = NO;
 
         if (uploadSuccessful && [dbHelper getEventCount] > self.eventUploadThreshold) {
@@ -1017,6 +1026,20 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
         SAFE_ARC_RELEASE(_userId);
         _userId = userId;
         [[TTDatabaseHelper getDatabaseHelper] insertOrReplaceKeyValue:USER_ID value:_userId];
+    }];
+}
+
+- (void)setUserName:(NSString*) userName
+{
+    if (!(userName == nil || [self isArgument:userName validType:[NSString class] methodName:@"setUserName:"])) {
+        return;
+    }
+    
+    [self runOnBackgroundQueue:^{
+        SAFE_ARC_RETAIN(userName);
+        SAFE_ARC_RELEASE(_userName);
+        _userName = userName;
+        [[TTDatabaseHelper getDatabaseHelper] insertOrReplaceKeyValue:USER_NAME value:_userName];
     }];
 }
 
