@@ -155,7 +155,7 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
     if (self = [super init]) {
         
         _dateFormatter = [[NSDateFormatter alloc]init];
-        [_dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZ"];
+        [_dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"];
         _initialized = NO;
         _locationListeningEnabled = YES;
         _sessionId = -1;
