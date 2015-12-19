@@ -11,13 +11,18 @@ An iOS SDK for tracking events to Traintracks
     ```
 
 5. In the application:didFinishLaunchingWithOptions: method of your YourAppNameAppDelegate.m file, initialize the SDK:
-    ``` objective-c
-    [[Traintracks instance] initializeApiKey:@"YOUR_API_KEY_HERE"];
+    ``` swift 
+    Traintracks.instance().initializeWithEndpoint("YOUR_API_ENDPOINT_HERE",
+            withBuildName: "YOUR_VERSION_NAME_HERE",
+            withKey: "YOUR_API_KEY_HERE",
+            withSecret: "YOUR_API_SECRET_HERE",
+            withUserId: "YOUR_USER_ID_HERE")
+    [[Traintracks instance] initializeWithEndpoint:@"YOUR_API_ENDPOINT_HERE" withBuildName:@"YOUR_];
     ```
 
 6. To track an event anywhere in the app, call:
-    ``` objective-c
-    [[Traintracks instance] logEvent:@"EVENT_IDENTIFIER_HERE"];
+    ``` swift 
+    Traintracks.instance().logEvent("EVENT_NAME")
     ```
 
 7. Events are saved locally. Uploads are batched to occur every 30 events and every 30 seconds, as well as on app close. After calling logEvent in your app, you will immediately see data appear on the Traintracks Website.
