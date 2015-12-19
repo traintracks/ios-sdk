@@ -149,26 +149,6 @@ Logging can be restarted by calling setOptOut again with enabled set to NO.
 No events will be logged during any period opt out is enabled, even after opt
 out is disabled.
 
-# Tracking Revenue #
-
-To track revenue from a user, call
-
-``` objective-c
-[[Traintracks instance] logRevenue:@"productIdentifier" quantity:1 price:[NSNumber numberWithDouble:3.99]]
-```
-
-after a successful purchase transaction. `logRevenue:` takes a string to identify the product (can be pulled from `SKPaymentTransaction.payment.productIdentifier`). `quantity:` takes an integer with the quantity of product purchased. `price:` takes a NSNumber with the dollar amount of the sale as the only argument. This allows us to automatically display data relevant to revenue on the Traintracks website, including average revenue per daily active user (ARPDAU), 7, 30, and 90 day revenue, lifetime value (LTV) estimates, and revenue by advertising campaign cohort and daily/weekly/monthly cohorts.
-
-**To enable revenue verification, copy your iTunes Connect In App Purchase Shared Secret into the manage section of your app on Traintracks. You must put a key for every single app in Traintracks where you want revenue verification.**
-
-Then call
-
-``` objective-c
-[[Traintracks instance] logRevenue:@"productIdentifier" quantity:1 price:[NSNumber numberWithDouble:3.99 receipt:receiptData]
-```
-
-after a successful purchase transaction. `receipt:` takes the receipt NSData from the app store. For details on how to obtain the receipt data, see [Apple's guide on Receipt Validation](https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW1).
-
 # Swift #
 
 This SDK will work with Swift. If you are copying the source files or using CocoaPods without the `use_frameworks!` directive, you should create a bridging header as documented [here](https://developer.apple.com/library/ios/documentation/Swift/Conceptual/BuildingCocoaApps/MixandMatch.html) and add the following line to your bridging header:
