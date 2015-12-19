@@ -17,7 +17,6 @@ An iOS SDK for tracking events to Traintracks
             withKey: "YOUR_API_KEY_HERE",
             withSecret: "YOUR_API_SECRET_HERE",
             withUserId: "YOUR_USER_ID_HERE")
-    [[Traintracks instance] initializeWithEndpoint:@"YOUR_API_ENDPOINT_HERE" withBuildName:@"YOUR_];
     ```
 
 6. To track an event anywhere in the app, call:
