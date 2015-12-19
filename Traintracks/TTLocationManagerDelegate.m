@@ -1,6 +1,6 @@
 //
-//  AMPLocationManagerDelegate.m
-
+//  TTLocationManagerDelegate.m
+//
 #import "TTLocationManagerDelegate.h"
 #import "Traintracks.h"
 

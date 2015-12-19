@@ -1,9 +1,5 @@
 //
-//  AMPUtils.h
-//  Pods
-//
-//  Created by Daniel Jih on 10/4/15.
-//
+//  TTUtils.h
 //
 
 @interface TTUtils : NSObject

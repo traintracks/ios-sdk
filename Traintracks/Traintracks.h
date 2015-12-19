@@ -83,14 +83,14 @@
  @abstract
  Update user properties using operations provided via Identify API.
 
- @param identify                   An AMPIdentify object with the intended user property operations
+ @param identify                   An TTIdentify object with the intended user property operations
 
  @discussion
- To update user properties, first create an AMPIdentify object. For example if you wanted to set a user's gender, and then increment their
+ To update user properties, first create an TTIdentify object. For example if you wanted to set a user's gender, and then increment their
  karma count by 1, you would do:
- AMPIdentify *identify = [[[AMPIdentify identify] set:@"gender" value:@"male"] add:@"karma" value:[NSNumber numberWithInt:1]];
- Then you would pass this AMPIdentify object to the identify function to send to the server: [[Amplitude instance] identify:identify];
- The Identify API supports add, set, setOnce, unset operations. See the AMPIdentify.h header file for the method signatures.
+ TTIdentify *identify = [[[TTIdentify identify] set:@"gender" value:@"male"] add:@"karma" value:[NSNumber numberWithInt:1]];
+ Then you would pass this TTIdentify object to the identify function to send to the server: [[Traintracks instance] identify:identify];
+ The Identify API supports add, set, setOnce, unset operations. See the TraintracksIdentify.h header file for the method signatures.
  */
 
 - (void)identify:(TTIdentify *)identify;
@@ -166,12 +166,12 @@
  @method
 
  @abstract
- Disables sending logged events to Amplitude servers.
+ Disables sending logged events to Traintracks servers.
 
- @param offline                  Whether logged events should be sent to Amplitude servers.
+ @param offline                  Whether logged events should be sent to Traintracks servers.
 
  @discussion
- If you want to stop logged events from being sent to Amplitude severs, use this method to set the client to offline. Once offline is enabled, logged events will not be sent to the server until offline is disabled. Calling this method again with offline set to false will allow events to be sent to server
+ If you want to stop logged events from being sent to Traintracks severs, use this method to set the client to offline. Once offline is enabled, logged events will not be sent to the server until offline is disabled. Calling this method again with offline set to false will allow events to be sent to server
      and the client will attempt to send events that have been queued while offline.
  */
 - (void)setOffline:(BOOL)offline;
@@ -184,7 +184,7 @@
 
  @discussion
  If the user has granted your app location permissions, the SDK will also grab the location of the user.
- Amplitude will never prompt the user for location permissions itself, this must be done by your app.
+ Traintracks will never prompt the user for location permissions itself, this must be done by your app.
  */
 - (void)enableLocationListening;
 

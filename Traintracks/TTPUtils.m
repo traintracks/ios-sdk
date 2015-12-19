@@ -1,9 +1,5 @@
 //
-//  AMPUtil.m
-//  Pods
-//
-//  Created by Daniel Jih on 10/4/15.
-//
+//  TTUtil.m
 //
 
 #import <Foundation/Foundation.h>

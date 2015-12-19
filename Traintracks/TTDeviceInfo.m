@@ -1,6 +1,6 @@
 //
-//  AMPDeviceInfo.m
-
+//  TTDeviceInfo.m
+//
 #import <Foundation/Foundation.h>
 #import "TTARCMacros.h"
 #import "TTDeviceInfo.h"

@@ -1,5 +1,5 @@
 //
-//  AMPIdentify.h
+//  TTIdentify.h
 //
 
 @interface TTIdentify : NSObject

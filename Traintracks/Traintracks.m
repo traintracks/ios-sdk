@@ -731,7 +731,6 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
 
     NSLog(@"BODY: %@", [[NSString alloc] initWithData:[request HTTPBody] encoding:NSUTF8StringEncoding]);
 
-    // If pinning is enabled, use the AMPURLConnection that handles it.
     id Connection = [NSURLConnection class];
     [Connection sendAsynchronousRequest:request queue:_backgroundQueue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         TTDatabaseHelper *dbHelper = [TTDatabaseHelper getDatabaseHelper];
