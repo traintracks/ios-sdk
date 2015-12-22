@@ -164,7 +164,7 @@ This SDK will work with Swift. If you are copying the source files or using Coco
 If you have `use_frameworks!` set, you should not use a bridging header and instead use the following line in your swift files:
 
 ``` swift
-import Traintracks_iOS
+import Traintracks
 ```
 
 In either case, you can call Traintracks methods with `Traintracks.instance().method(...)`

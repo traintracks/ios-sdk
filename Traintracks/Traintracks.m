@@ -718,11 +718,8 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
     // Body
     NSMutableData *postData = [[NSMutableData alloc] init];
     [postData appendData:[events dataUsingEncoding:NSUTF8StringEncoding]];
-    //[postData appendData:[[self urlEncodeString:events] dataUsingEncoding:NSUTF8StringEncoding]];
 
     [request setHTTPBody:postData];
-
-
 
 
     NSLog(@"URL: %@", [request URL]);
