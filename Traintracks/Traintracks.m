@@ -278,8 +278,7 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
  * SetUserId: client explicitly initialized with a userId (can be nil).
  * If false, then attempt to load userId from saved eventsData.
  */
-- (void)initializeWithEndpoint:(NSString*)endpointUrl withBuildName:(NSString*)buildName withKey:(NSString*)key withSecret:secret withUserId:(NSString*)userId
-{
+- (void)initializeWithEndpoint:(NSString*)endpointUrl withBuildName:(NSString*)buildName withKey:(NSString*)key withSecret:(NSString*)secret withUserId:(NSString*) userId {
     if (endpointUrl == nil) {
         NSLog(@"ERROR: endpointUrl cannot be nil in initializeWithEndpoint:");
         return;

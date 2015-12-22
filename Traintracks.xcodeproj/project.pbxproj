@@ -12,7 +12,6 @@
 		60D418B41BC1BFE9006CC505 /* TTPUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 60D418B31BC1BFE9006CC505 /* TTPUtils.m */; };
 		9DC7085A1AD4B28300949778 /* TTConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DC708591AD4B28300949778 /* TTConstants.m */; };
 		9F7286301C192D9E00E09DB5 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F72862F1C192D9E00E09DB5 /* CoreLocation.framework */; };
-		A98384A6387C23A033A67FF3 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47CA863610494E1D80BB1EAC /* libPods.a */; };
 		E96785EC1A48E93F00887CCD /* TTDeviceInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = E96785E41A48E93F00887CCD /* TTDeviceInfo.m */; };
 		E96785ED1A48E93F00887CCD /* Traintracks.m in Sources */ = {isa = PBXBuildFile; fileRef = E96785E71A48E93F00887CCD /* Traintracks.m */; };
 		E96785EE1A48E93F00887CCD /* TTLocationManagerDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E96785E91A48E93F00887CCD /* TTLocationManagerDelegate.m */; };
@@ -31,7 +30,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		47CA863610494E1D80BB1EAC /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		605E43C91BA0D92A00FD78CE /* TTDatabaseHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTDatabaseHelper.m; sourceTree = "<group>"; };
 		605E43CB1BA0DB4F00FD78CE /* TTDatabaseHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTDatabaseHelper.h; sourceTree = "<group>"; };
 		608865D41BC30EBB00233023 /* TTIdentify.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTIdentify.m; sourceTree = "<group>"; };
@@ -59,7 +57,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F7286301C192D9E00E09DB5 /* CoreLocation.framework in Frameworks */,
-				A98384A6387C23A033A67FF3 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,7 +67,6 @@
 			isa = PBXGroup;
 			children = (
 				9F72862F1C192D9E00E09DB5 /* CoreLocation.framework */,
-				47CA863610494E1D80BB1EAC /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

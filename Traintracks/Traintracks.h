@@ -60,7 +60,7 @@
 
 + (Traintracks*)instance;
 
-- (void)initializeWithEndpoint:(NSString*)endpointUrl withBuildName:(NSString*)buildName withKey:(NSString*)key withSecret:secret withUserId:(NSString*) userId;
+- (void)initializeWithEndpoint:(NSString*)endpointUrl withBuildName:(NSString*)buildName withKey:(NSString*)key withSecret:(NSString*)secret withUserId:(NSString*) userId;
 
 /*!
  @method
