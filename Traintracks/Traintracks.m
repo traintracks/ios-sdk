@@ -712,7 +712,6 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [request setValue:_apiKey forHTTPHeaderField:@"X-Product-Key"];
     [request setValue:[NSString stringWithFormat:@"%@", checksum] forHTTPHeaderField:@"X-Product-Auth"];
-    [request setValue:@"1.2.3.4" forHTTPHeaderField:@"Remote-Address"];
     
     // Body
     NSMutableData *postData = [[NSMutableData alloc] init];
