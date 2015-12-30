@@ -154,16 +154,3 @@ import Traintracks
 
 In either case, you can call Traintracks methods with `Traintracks.instance().method(...)`
 
-# Advanced #
-
-This SDK automatically grabs useful data from the phone, including app version, phone model, operating system version, and carrier information. If the user has granted your app location permissions, the SDK will also grab the location of the user. Traintracks will never prompt the user for location permissions itself, this must be done by your app. Traintracks only polls for a location once on startup of the app, once on each app open, and once when the permission is first granted. There is no continuous tracking of location. If you wish to disable location tracking done by the app, you can call `[[Traintracks instance] disableLocationListening]` at any point. If you want location tracking disabled on startup of the app, call disableLocationListening before you call `initializeApiKey:`. You can always reenable location tracking through Traintracks with `[[Traintracks instance] enableLocationListening]`.
-
-User IDs are automatically generated and will default to device specific identifiers if not specified.
-
-Device IDs are randomly generated. You can, however, choose to instead use the identifierForVendor (if available) by calling `[[Traintracks instance] useAdvertisingIdForDeviceId]` before initializing with your API key. You can also retrieve the Device ID that Traintracks uses with `[[Traintracks instance] getDeviceId]`.
-
-If you have your own system for tracking device IDs and would like to set a custom device ID, you can do so with `[[Traintracks instance] setDeviceId:@"CUSTOM_DEVICE_ID"];` **Note: this is not recommended unless you really know what you are doing.** Make sure the device ID you set is sufficiently unique (we recommend something like a UUID - see `[TTUtils generateUUID]` for an example on how to generate) to prevent conflicts with other devices in our system.
-
-This code will work with both ARC and non-ARC projects. Preprocessor macros are used to determine which version of the compiler is being used.
-
-The SDK includes support for SSL pinning, but it is undocumented and recommended against unless you have a specific need. Please contact Traintracks support before you ship any products with SSL pinning enabled so that we are aware and can provide documentation and implementation help.
