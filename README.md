@@ -1,30 +1,35 @@
-Traintracks iOS SDK
-====================
+# ios-sdk-example
 
-An iOS SDK for tracking events to Traintracks
+This is an example project on how to use the iOS SDK.
 
+The application is based on [https://github.com/fullstackio/FlappySwift] and records events as one uses the application and sends them to Traintracks.
 
-# Setup #
-4. In every file that uses analytics, import Traintracks.h at the top:
-    ``` swift 
-    import Traintracks 
-    ```
+# Setup with CocoaPods 
+Add this to your podfile
+```
+pod 'Traintracks', :git => 'https://github.com/traintracks/ios-sdk.git'
+```
 
-5. In the application:didFinishLaunchingWithOptions: method of your YourAppNameAppDelegate.m file, initialize the SDK:
-    ``` swift 
-    Traintracks.instance().initializeWithEndpoint("YOUR_API_ENDPOINT_HERE",
-            withBuildName: "YOUR_VERSION_NAME_HERE",
-            withKey: "YOUR_API_KEY_HERE",
-            withSecret: "YOUR_API_SECRET_HERE",
-            withUserId: "YOUR_USER_ID_HERE")
-    ```
+In every file that uses analytics, import Traintracks.h at the top:
+ ``` swift 
+import Traintracks
+ ```
 
-6. To track an event anywhere in the app, call:
-    ``` swift 
-    Traintracks.instance().logEvent("EVENT_NAME")
-    ```
+In the application:didFinishLaunchingWithOptions: method of your YourAppNameAppDelegate.m file, initialize the SDK:
+ ``` swift 
+ Traintracks.instance().initializeWithEndpoint("YOUR_API_ENDPOINT_HERE",
+         withBuildName: "YOUR_VERSION_NAME_HERE",
+         withKey: "YOUR_API_KEY_HERE",
+         withSecret: "YOUR_API_SECRET_HERE",
+         withUserId: "YOUR_USER_ID_HERE")
+ ```
 
-7. Events are saved locally. Uploads are batched to occur every 30 events and every 30 seconds, as well as on app close. After calling logEvent in your app, you will immediately see data appear on the Traintracks Website.
+To track an event anywhere in the app, call:
+ ``` swift 
+ Traintracks.instance().logEvent("EVENT_NAME")
+ ```
+
+Events are saved locally. Uploads are batched to occur every 30 events and every 30 seconds, as well as on app close. After calling logEvent in your app, you will immediately see data appear on the Traintracks Website.
 
 # Tracking Events #
 
@@ -37,37 +42,17 @@ A session is a period of time that a user has the app in the foreground. Session
 You can adjust the time window for which sessions are extended by changing the variable minTimeBetweenSessionsMillis:
 ``` objective-c
 [Traintracks instance].minTimeBetweenSessionsMillis = 30 * 60 * 1000; // 30 minutes
-[[Traintracks instance] initializeApiKey:@"YOUR_API_KEY_HERE"];
 ```
 
-By default start and end session events are no longer sent. To renable add this line before initializing the SDK:
+By default start and end session events are not sent. To enable add this line before initializing the SDK:
 ``` objective-c
 [[Traintracks instance] trackingSessionEvents:YES];
-[[Traintracks instance] initializeApiKey:@"YOUR_API_KEY_HERE"];
 ```
 
 You can also log events as out of session. Out of session events have a session_id of -1 and are not considered part of the current session, meaning they do not extend the current session. You can log events as out of session by setting input parameter outOfSession to true when calling logEvent.
 
 ``` objective-c
 [[Traintracks instance] logEvent:@"EVENT_IDENTIFIER_HERE" withEventProperties:nil outOfSession:true];
-```
-
-# Setting Custom User IDs #
-
-If your app has its own login system that you want to track users with, you can call `setUserId:` at any time:
-
-``` objective-c
-[[Traintracks instance] setUserId:@"USER_ID_HERE"];
-```
-
-You can also clear the user ID by calling `setUserId` with input `nil`. Events without a user ID are anonymous.
-
-A user's data will be merged on the backend so that any events up to that point on the same device will be tracked under the same user.
-
-You can also add the user ID as an argument to the `initializeApiKey:` call:
-
-``` objective-c
-[[Traintracks instance] initializeApiKey:@"YOUR_API_KEY_HERE" userId:@"USER_ID_HERE"];
 ```
 
 # Setting Event Properties #
