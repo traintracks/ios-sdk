@@ -709,7 +709,7 @@ static NSString *const SEQUENCE_NUMBER = @"sequenceNumber";
     // Header
     NSString *checksumData = [NSString stringWithFormat:@"%@%@", events, _apiSecret];
     NSString *checksum = [self md5HexDigest: checksumData];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setValue:@"application/json; charset=UTF-8" forHTTPHeaderField:@"Content-Type"];
     [request setValue:_apiKey forHTTPHeaderField:@"X-Product-Key"];
     [request setValue:[NSString stringWithFormat:@"%@", checksum] forHTTPHeaderField:@"X-Product-Auth"];
     
