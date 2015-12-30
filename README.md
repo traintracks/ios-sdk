@@ -6,8 +6,8 @@ An iOS SDK for tracking events to Traintracks
 
 # Setup #
 4. In every file that uses analytics, import Traintracks.h at the top:
-    ``` objective-c
-    #import "Traintracks.h"
+    ``` swift 
+    import Traintracks 
     ```
 
 5. In the application:didFinishLaunchingWithOptions: method of your YourAppNameAppDelegate.m file, initialize the SDK:
